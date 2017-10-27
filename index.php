@@ -2,26 +2,28 @@
 
 require_once __DIR__ . '/helpers.php';
 
-class JsonToCsvConverter
+class DataToInfo
 {
-    public function __construct($dirPath = 'json_files/*.json')
+    public function extractInfo($dirPath = 'text_files/*.txt')
     {
         $files = glob($dirPath);
         foreach ($files as $key => $file) {
-            $jsonString = $this->getJsonFile($file);
-            $dataInArray = $this->jsonToArrayProcessor($jsonString);
-            $csvFiles[] = $this->createCsvFile($this->getOutFileName(), $dataInArray);
+            $dataString = $this->getTextFile($file);
+            $dataInArray = $this->processData($dataString);
+            // dd('dsfsdf');
+            return $dataInArray;
+            // $csvFiles[] = $this->createCsvFile($this->getOutFileName(), $dataInArray);
         }
     }
 
-    public function getJsonFile($filePath)
+    public function getTextFile($filePath)
     {
         return file_get_contents($filePath);
     }
 
-    public function jsonToArrayProcessor($dataInJson)
+    public function processData($data)
     {
-        return json_decode($dataInJson, true);
+        return json_encode($this->extractUrlsFromString($data), JSON_FORCE_OBJECT);
     }
 
     public function createCsvFile($outFileName, $dataInArray)
@@ -37,10 +39,19 @@ class JsonToCsvConverter
         return $outFileName;
     }
 
+    public function extractUrlsFromString($targetString)
+    {
+        preg_match_all('#\bhttps?://[^\s()<>]+(?:\([\w\d]+\)|([^[:punct:]\s]|/))#', $targetString, $result);
+
+        return $result[0];
+    }
+
     public function getOutFileName()
     {
-        return 'csv_files/' . date('dmyhis') . 'csv';
+        return 'csv_files/' . date('dmyhis') . '.csv';
     }
 }
 
-$newObj = new JsonToCsvConverter();
+$newObj = new DataToInfo();
+
+echo $newObj->extractInfo();

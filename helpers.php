@@ -1,6 +1,6 @@
 <?php
 
-function dd($expression)
+function dd($expression = null)
 {
     var_dump($expression);
     exit();
